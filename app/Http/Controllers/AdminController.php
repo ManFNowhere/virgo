@@ -38,8 +38,14 @@ class AdminController extends Controller
 
     public function destroyMovie(Movie $movie)
     {
-        Storage::disk('public')->delete(ltrim(str_replace('/storage/', '', $movie->movie), '/'));
-        Storage::disk('public')->delete(ltrim(str_replace('/storage/', '', $movie->trailer), '/'));
+        if ($movie->movie && ! Movie::where('id', '!=', $movie->id)->where('movie', $movie->movie)->exists()) {
+            Storage::disk('public')->delete(ltrim(str_replace('/storage/', '', $movie->movie), '/'));
+        }
+
+        if ($movie->trailer && ! Movie::where('id', '!=', $movie->id)->where('trailer', $movie->trailer)->exists()) {
+            Storage::disk('public')->delete(ltrim(str_replace('/storage/', '', $movie->trailer), '/'));
+        }
+
         $movie->delete();
 
         return redirect()->route('dashboard')->with('success', 'Movie deleted.');
